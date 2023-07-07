@@ -6,7 +6,7 @@ if ENV['COVERAGE'] == 'true'
 
   SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
 
-  SimpleCov.start do
+  SimpleCov.start('rails') do
     add_filter '/spec/'
     enable_coverage :branch
   end

@@ -1,4 +1,4 @@
-# Taksi Rails [![Gem Version](https://badge.fury.io/rb/taksi-rails.svg)](https://badge.fury.io/rb/taksi-rails) [![CI](https://github.com/taksi-br/taksi-rails/actions/workflows/ci.yml/badge.svg)](https://github.com/taksi-br/taksi-rails/actions/workflows/ci.yml)
+# Taksi Rails [![Gem Version](https://badge.fury.io/rb/taksi-rails.svg)](https://badge.fury.io/rb/taksi-rails) [![CI](https://github.com/taksi-br/taksi-rails/actions/workflows/ci.yml/badge.svg)](https://github.com/taksi-br/taksi-rails/actions/workflows/ci.yml) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/3f297f96a6e1436289bc907042c8e014)](https://app.codacy.com/gh/taksi-br/taksi-rails/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 A rails engine/railtie to the Taksi framework.
 
