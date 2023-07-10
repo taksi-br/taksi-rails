@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe ::Taksi::DataController, type: :controller do
+RSpec.describe ::Taksi::InterfacesController, type: :controller do
   render_views
 
   before do
@@ -19,23 +19,19 @@ RSpec.describe ::Taksi::DataController, type: :controller do
     Object.send(:remove_const, :DummyInterface)
   end
 
-  describe 'GET /interface/:id/data' do
+  describe 'GET /skeletons/:id' do
     context 'when interface exists with components' do
       before do
         class DummyComponent
           include ::Taksi::Component.new('dummy/component')
 
           content do
-            title Taksi::Dynamic
+            title Taksi::Static, 'Static Key Title'
           end
         end
 
         class DummyInterface
-          add DummyComponent, with: :dummy_data
-
-          def dummy_data
-            {title: 'dummy_value'}
-          end
+          add DummyComponent
         end
       end
 
@@ -44,17 +40,20 @@ RSpec.describe ::Taksi::DataController, type: :controller do
       end
 
       it 'returns the skeleton json' do
-        get :index, params: {interface_id: 'dummy-interface'}
+        get :show, params: {id: 'dummy-interface'}
 
         parsed_json_response = JSON.parse(response.body)
 
-        expect(parsed_json_response).to have_key('interface_data')
-        expect(parsed_json_response['interface_data']).to include({
-                                                                    'identifier' => 'component$0',
-                                                                    'content' => {
-                                                                      'title' => 'dummy_value'
-                                                                    }
-                                                                  })
+        expect(parsed_json_response).to have_key('components')
+        expect(parsed_json_response['components']).to be_kind_of(Array)
+        expect(parsed_json_response['components'].size).to eq(1)
+        expect(parsed_json_response['components'].first).to eq({
+                                                                 'name' => 'dummy/component',
+                                                                 'identifier' => 'component$0',
+                                                                 'content' => {
+                                                                   'title' => 'Static Key Title'
+                                                                 }
+                                                               })
       end
     end
 
@@ -62,7 +61,7 @@ RSpec.describe ::Taksi::DataController, type: :controller do
 
     context 'when a interface cannot be found' do
       it 'returns the skeleton json' do
-        get :index, params: {interface_id: 'unknown-interface'}
+        get :show, params: {id: 'unknown-interface'}
 
         expect(response).to have_http_status(:not_found)
       end
@@ -74,7 +73,7 @@ RSpec.describe ::Taksi::DataController, type: :controller do
       end
 
       it 'returns the skeleton json' do
-        get :index, params: {interface_id: 'dummy-interface'}
+        get :show, params: {id: 'dummy-interface'}
 
         expect(response).to have_http_status(:not_found)
       end
