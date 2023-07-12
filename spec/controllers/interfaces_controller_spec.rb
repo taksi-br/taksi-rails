@@ -50,6 +50,7 @@ RSpec.describe ::Taksi::InterfacesController, type: :controller do
         expect(parsed_json_response['components'].first).to eq({
                                                                  'name' => 'dummy/component',
                                                                  'identifier' => 'component$0',
+                                                                 'requires_data' => false,
                                                                  'content' => {
                                                                    'title' => 'Static Key Title'
                                                                  }
