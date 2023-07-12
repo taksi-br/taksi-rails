@@ -19,14 +19,14 @@ RSpec.describe ::Taksi::InterfacesController, type: :controller do
     Object.send(:remove_const, :DummyInterface)
   end
 
-  describe 'GET /skeletons/:id' do
+  describe 'GET /interfaces/:id' do
     context 'when interface exists with components' do
       before do
         class DummyComponent
           include ::Taksi::Component.new('dummy/component')
 
           content do
-            title Taksi::Static, 'Static Key Title'
+            field :title, Taksi::Static, 'Static Key Title'
           end
         end
 
@@ -59,6 +59,14 @@ RSpec.describe ::Taksi::InterfacesController, type: :controller do
     end
 
     xcontext 'when interface exists with no components'
+
+    context 'when interface name is invalid' do
+      it 'fails with HTTP 404' do
+        get :show, params: {id: 'invalid.interface%name'}
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
 
     context 'when a interface cannot be found' do
       it 'returns the skeleton json' do
