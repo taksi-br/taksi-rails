@@ -2,11 +2,14 @@
 
 module Taksi
   class DataController < ::Taksi::ApplicationController
-    def show
-      screen = ::Taksi::Screen.find(params[:id].to_sym, request.env['X_Taksi_VERSION']).new
+    def index
+      return head(404) unless params[:interface_id].match?(::Taksi::Registry::NAME_REGEX)
 
-      render json: screen.data.as_json
-    rescue Taksi::Registry::ScreenNotFoundError
+      interface = ::Taksi::Interface.find(params[:interface_id].to_sym,
+                                          request.env['X_TAKSI_VERSION']).new
+
+      render json: {interface_data: interface.data.as_json}
+    rescue Taksi::Registry::InterfaceNotFoundError
       head(404)
     end
   end
