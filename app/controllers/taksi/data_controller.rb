@@ -3,6 +3,8 @@
 module Taksi
   class DataController < ::Taksi::ApplicationController
     def index
+      return head(404) unless params[:interface_id].match?(::Taksi::Registry::NAME_REGEX)
+
       interface = ::Taksi::Interface.find(params[:interface_id].to_sym,
                                           request.env['X_TAKSI_VERSION']).new
 

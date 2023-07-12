@@ -60,6 +60,14 @@ RSpec.describe ::Taksi::DataController, type: :controller do
 
     xcontext 'when interface exists with no components'
 
+    context 'when interface name is invalid' do
+      it 'fails with HTTP 404' do
+        get :index, params: {interface_id: 'invalid.interface%name'}
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
     context 'when a interface cannot be found' do
       it 'returns the skeleton json' do
         get :index, params: {interface_id: 'unknown-interface'}
