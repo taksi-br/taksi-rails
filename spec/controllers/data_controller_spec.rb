@@ -26,15 +26,15 @@ RSpec.describe ::Taksi::DataController, type: :controller do
           include ::Taksi::Component.new('dummy/component')
 
           content do
-            field :title, Taksi::Dynamic
+            field :title, Taksi::Static, 'dummy_value'
           end
         end
 
         class DummyInterface
-          add DummyComponent, with: :dummy_data
+          add DummyComponent, with: :nothing
 
-          def dummy_data
-            {title: 'dummy_value'}
+          def nothing
+            nil
           end
         end
       end
@@ -53,6 +53,49 @@ RSpec.describe ::Taksi::DataController, type: :controller do
                                                                     'identifier' => 'component$0',
                                                                     'content' => {
                                                                       'title' => 'dummy_value'
+                                                                    }
+                                                                  })
+      end
+    end
+
+    context 'when interface has dynamic components' do
+      before do
+        class DummyComponent
+          include ::Taksi::Component.new('dummy/component')
+
+          content do
+            field :title, Taksi::Dynamic
+            field :custom_content, Taksi::Dynamic
+          end
+        end
+
+        class DummyInterface
+          add DummyComponent, with: :dummy_data
+
+          def dummy_data
+            {
+              title: 'dummy_value',
+              custom_content: options[:params].require(:custom_content)
+            }
+          end
+        end
+      end
+
+      after do
+        Object.send(:remove_const, :DummyComponent)
+      end
+
+      it 'returns the skeleton json' do
+        get :index, params: {interface_id: 'dummy-interface', custom_content: 'custom_content_from_query_param'}
+
+        parsed_json_response = JSON.parse(response.body)
+
+        expect(parsed_json_response).to have_key('interface_data')
+        expect(parsed_json_response['interface_data']).to include({
+                                                                    'identifier' => 'component$0',
+                                                                    'content' => {
+                                                                      'title' => 'dummy_value',
+                                                                      'custom_content' => 'custom_content_from_query_param'
                                                                     }
                                                                   })
       end
