@@ -58,6 +58,50 @@ RSpec.describe ::Taksi::InterfacesController, type: :controller do
       end
     end
 
+    context 'when interface has dynamic components' do
+      before do
+        class DummyComponent
+          include ::Taksi::Component.new('dummy/component')
+
+          content do
+            field :title, Taksi::Static, 'Static Key Title'
+            field :custom_content, Taksi::Dynamic
+          end
+        end
+
+        class DummyInterface
+          add DummyComponent, with: :dummy_data
+
+          def dummy_data
+            {custom_content: options[:params].require(:custom_content)}
+          end
+        end
+      end
+
+      after do
+        Object.send(:remove_const, :DummyComponent)
+      end
+
+      it 'returns the skeleton json' do
+        get :show, params: {id: 'dummy-interface', custom_content: 'a_custom_content'}
+
+        parsed_json_response = JSON.parse(response.body)
+
+        expect(parsed_json_response).to have_key('components')
+        expect(parsed_json_response['components']).to be_kind_of(Array)
+        expect(parsed_json_response['components'].size).to eq(1)
+        expect(parsed_json_response['components'].first).to eq({
+                                                                 'name' => 'dummy/component',
+                                                                 'identifier' => 'component$0',
+                                                                 'requires_data' => true,
+                                                                 'content' => {
+                                                                   'title' => 'Static Key Title',
+                                                                   'custom_content' => nil
+                                                                 }
+                                                               })
+      end
+    end
+
     xcontext 'when interface exists with no components'
 
     context 'when interface name is invalid' do
